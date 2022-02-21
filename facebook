@@ -1,0 +1,30 @@
+{
+  id: '1385999241843524',
+  username: undefined,
+  displayName: 'Yurii Cherniak',
+  name: {
+    familyName: undefined,
+    givenName: undefined,
+    middleName: undefined
+  },
+  gender: undefined,
+  profileUrl: undefined,
+  provider: 'facebook',
+  _raw: '{"name":"Yurii Cherniak","id":"1385999241843524"}',
+  _json: { name: 'Yurii Cherniak', id: '1385999241843524' }
+}
+{
+  id: '1385999241843524',
+  username: undefined,
+  displayName: 'Yurii Cherniak',
+  name: {
+    familyName: undefined,
+    givenName: undefined,
+    middleName: undefined
+  },
+  gender: undefined,
+  profileUrl: undefined,
+  provider: 'facebook',
+  _raw: '{"name":"Yurii Cherniak","id":"1385999241843524"}',
+  _json: { name: 'Yurii Cherniak', id: '1385999241843524' }
+}
