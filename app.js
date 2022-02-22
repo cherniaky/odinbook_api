@@ -54,9 +54,10 @@ passport.use(
             clientID: "3201779453423648",
             clientSecret: "abf9c28805d5f991263ca2114beae96d",
             callbackURL: `${server_url}/oauth/redirect/facebook`,
+            profileFields: ["id", "displayName", "photos", "email"],
         },
         function (accessToken, refreshToken, profile, done) {
-            //console.log(profile);
+            console.log(profile);
             //return done(null, profile);
             //check user table for anyone with a facebook ID of profile.id
             User.findOne(
@@ -94,7 +95,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/auth/facebook", passport.authenticate("facebook"));
+app.get(
+    "/auth/facebook",
+    passport.authenticate("facebook" )
+);
 
 app.get(
     "/oauth/redirect/facebook",
@@ -127,7 +131,7 @@ passport.serializeUser(function (user, done) {
 
 passport.deserializeUser(function (id, done) {
     User.findById(id, function (err, user) {
-        done(err, user);
+        done(err, { userData: user, token: "hi" });
     });
 });
 
