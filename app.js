@@ -8,7 +8,8 @@ var logger = require("morgan");
 const session = require("express-session");
 const cors = require("cors");
 
-var apiRouter = require("./routes/api");
+var authRouter = require("./routes/auth");
+var postRouter = require("./routes/post");
 
 var passport = require("passport");
 var FacebookStrategy = require("passport-facebook").Strategy;
@@ -135,7 +136,8 @@ passport.deserializeUser(function (id, done) {
     });
 });
 
-app.use("/api", apiRouter);
+app.use("/auth", authRouter);
+app.use("/posts", postRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

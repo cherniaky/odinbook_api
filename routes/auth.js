@@ -8,6 +8,10 @@ const Token = require("../models/Token");
 const User = require("../models/User");
 
 
+
+
+
+
 async function saveToken(userid, refreshToken) {
     const tokenData = await Token.findOne({ user: userid });
     if (tokenData) {
@@ -26,13 +30,80 @@ router.get("/", function (req, res, next) {
 
 router.post("/login", async (req, res, next) => {
     //console.log(req.body.username);
-    const user = await User.findOne({ email: req.body.email }).select("+password");
+    const user = await User.findOne({ email: req.body.email }).select(
+        "+password"
+    );
 
     if (!user) {
         return res.status(404).send("User not found!");
     }
 
     const validate = bcrypt.compareSync(req.body.password, user.password);
+    //req.body.password === user.password;
+
+    if (!validate) {
+        return res.status(400).send("Wrong Password");
+    }
+
+    try {
+        const body = {
+            _id: user._id,
+            firstName: user.firstName,
+            email: user.email,
+        };
+
+        const accessToken = jwt.sign({ user: body }, process.env.SECRET_KEY, {
+            expiresIn: "15m",
+        });
+        const refreshToken = jwt.sign(
+            { user: body },
+            process.env.SECRET_KEY_REFRESH,
+            {
+                expiresIn: "15d",
+            }
+        );
+
+        await saveToken(user._id, refreshToken);
+
+        // res.setHeader("set-cookie", [
+        //     `refreshToken=${refreshToken}; Max-Age=1296000; Path=/; SameSite=None;Secure `,
+        // ]);
+        res.cookie("refreshToken", refreshToken, {
+            maxAge: 15 * 24 * 60 * 60 * 1000,
+            //httpOnly: true,
+            // sameSite: "none",
+        });
+
+        return res.json({ accessToken, refreshToken, user: body });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+router.post("/login/facebook", async (req, res, next) => {
+    //console.log(req.body.username);
+    const user = await User.findOne({ facebookId: req.body.facebookId }).select(
+        "+password"
+    );
+
+    if (!user) {
+        var salt = bcrypt.genSaltSync(10);
+        var hash = bcrypt.hashSync(req.body.facebookId, salt);
+        const user = {
+            firstName: req.body.firstName || "No first name",
+            familyName: req.body.familyName || "No family name",
+            email: req.body.email || "No email",
+            password: hash,
+        };
+        await User.create({ ...user });
+        return res.json({
+            message: "Signed-up sucessfuly",
+            user,
+        });
+        // return res.status(404).send("User not found!");
+    }
+
+    const validate = bcrypt.compareSync(req.body.facebookId, user.password);
     //req.body.password === user.password;
 
     if (!validate) {
@@ -181,7 +252,7 @@ router.post(
         const emailExist = await User.findOne({ email: req.body.email });
         //console.log(user);
         if (emailExist) {
-           return res.json({
+            return res.json({
                 errors: [
                     {
                         value: req.body.email,
@@ -191,11 +262,11 @@ router.post(
                     },
                 ],
             });
-           // return next(new Error("email already exist"));
+            // return next(new Error("email already exist"));
         }
 
         // const equalPass = req.body.password === req.body.password2;
-        
+
         // if (!equalPass) {
         //     return next(new Error("confirm password not equal"));
         // }

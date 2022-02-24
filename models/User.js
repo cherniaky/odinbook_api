@@ -54,8 +54,19 @@ const UserSchema = new Schema(
             type: Date,
             default: Date.now,
         },
-    },
-    { toJSON: { virtuals: true } }
+    }
+    // ,
+    // { toJSON: { virtuals: true } }
 );
 
-module.exports = mongoose.model("User", UserSchema);
+UserSchema.virtual("fullName").get(function () {
+    return this.firstName + " " + this.familyName;
+});
+
+UserSchema.virtual("posts", {
+    ref: "post",
+    foreignField: "user",
+    localField: "_id",
+});
+
+module.exports = mongoose.model("user", UserSchema);
