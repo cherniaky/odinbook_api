@@ -36,6 +36,7 @@ const PostSchema = new Schema({
             user: {
                 type: mongoose.Types.ObjectId,
                 ref: "user",
+                //required: true,
             },
             name: {
                 type: String,

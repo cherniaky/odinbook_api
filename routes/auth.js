@@ -22,12 +22,6 @@ async function saveToken(userid, refreshToken) {
     return token;
 }
 
-/* GET home page. */
-router.get("/", function (req, res, next) {
-    // console.log(req.user);
-    res.json({ hi: "ds" });
-});
-
 router.post("/login", async (req, res, next) => {
     //console.log(req.body.username);
     const user = await User.findOne({ email: req.body.email }).select(
@@ -46,17 +40,18 @@ router.post("/login", async (req, res, next) => {
     }
 
     try {
-        const body = {
+        const userData = {
             _id: user._id,
             firstName: user.firstName,
+            familyName: user.familyName,
             email: user.email,
         };
 
-        const accessToken = jwt.sign({ user: body }, process.env.SECRET_KEY, {
+        const accessToken = jwt.sign({ user: userData }, process.env.SECRET_KEY, {
             expiresIn: "15m",
         });
         const refreshToken = jwt.sign(
-            { user: body },
+            { user: userData },
             process.env.SECRET_KEY_REFRESH,
             {
                 expiresIn: "15d",
@@ -74,7 +69,7 @@ router.post("/login", async (req, res, next) => {
             // sameSite: "none",
         });
 
-        return res.json({ accessToken, refreshToken, user: body });
+        return res.json({ accessToken, refreshToken, user: userData });
     } catch (error) {
         return next(error);
     }
@@ -111,17 +106,18 @@ router.post("/login/facebook", async (req, res, next) => {
     }
 
     try {
-        const body = {
+        const userData = {
             _id: user._id,
             firstName: user.firstName,
+            familyName: user.familyName,
             email: user.email,
         };
 
-        const accessToken = jwt.sign({ user: body }, process.env.SECRET_KEY, {
+        const accessToken = jwt.sign({ user: userData }, process.env.SECRET_KEY, {
             expiresIn: "15m",
         });
         const refreshToken = jwt.sign(
-            { user: body },
+            { user: userData },
             process.env.SECRET_KEY_REFRESH,
             {
                 expiresIn: "15d",
@@ -139,7 +135,7 @@ router.post("/login/facebook", async (req, res, next) => {
             // sameSite: "none",
         });
 
-        return res.json({ accessToken, refreshToken, user: body });
+        return res.json({ accessToken, refreshToken, user: userData });
     } catch (error) {
         return next(error);
     }
@@ -176,6 +172,7 @@ router.get("/refresh", async function (req, res, next) {
     const userData = {
         _id: user._id,
         firstName: user.firstName,
+        familyName: user.familyName,
         email: user.email,
     };
 
