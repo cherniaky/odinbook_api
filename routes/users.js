@@ -2,10 +2,17 @@ const express = require("express");
 const router = express.Router();
 const jwtMidd = require("../middleware/jwtAuth");
 const { body, validationResult } = require("express-validator");
+var cloudinary = require("cloudinary").v2;
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Friend = require("../models/Friend");
+
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: "969838447445233",
+    api_secret: process.env.API_SECRET,
+});
 
 router.get("/", jwtMidd, async (req, res, next) => {
     try {
@@ -95,22 +102,20 @@ router.put("/current/profile", jwtMidd, async (req, res) => {
             { new: true }
         ); 
            
-        // if (image) {
-        //     const fileString = req.body.image;
-        //     const uploadResponse = await cloudinary.uploader.upload(
-        //         fileString,
-        //         {
-        //             upload_preset: "odinbook-profile-pics",
-        //         }
-        //     );
+        if (image) {
+            const fileString = req.body.image;
+            const uploadResponse = await cloudinary.uploader.upload(
+                fileString,
+                {
+                    upload_preset: "odinbook-profile-pics",
+                }
+            );
 
-        //     user.profilePic = uploadResponse.url;
+            user.profilePic = uploadResponse.url;
 
-        //     await user.save();
-        // } 
-        // else {
-        //     await user.save();
-        // }
+            await user.save();
+        } 
+       
         
         res.json(user);
     } catch (err) {
