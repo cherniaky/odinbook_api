@@ -10,6 +10,7 @@ const cors = require("cors");
 
 var authRouter = require("./routes/auth");
 var postRouter = require("./routes/post");
+var userRouter = require("./routes/users"); 
 
 var passport = require("passport");
 var FacebookStrategy = require("passport-facebook").Strategy;
@@ -138,6 +139,7 @@ passport.deserializeUser(function (id, done) {
 
 app.use("/auth", authRouter);
 app.use("/posts", postRouter);
+app.use("/users", userRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
