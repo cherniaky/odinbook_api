@@ -10,7 +10,7 @@ const Friend = require("../models/Friend");
 
 router.get("/", jwtMidd, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).populate({
+        const user = await User.findById(req.user._id).populate({
             path: "friends",
             populate: { path: "friendId" },
         });
@@ -73,25 +73,29 @@ router.post("/:id", jwtMidd, async (req, res) => {
 });
 
 router.post("/:id/accept", jwtMidd, async (req, res) => {
-    await Friend.findOneAndUpdate(
-        {
-            friendId: req.params.id,
-            user: req.user._id,
-        },
-        { $set: { status: "accepted" } },
-        { upsert: true, new: true }
-    );
+    try {
+        await Friend.findOneAndUpdate(
+            {
+                friendId: req.params.id,
+                user: req.user._id,
+                $or: [{ status: "recieved" }, { status: "seen" }],
+            },
+            { $set: { status: "accepted" } }
+        );
 
-    await Friend.findOneAndUpdate(
-        {
-            friendId: req.user._id,
-            user: req.params.id,
-        },
-        { $set: { status: "accepted" } },
-        { upsert: true, new: true }
-    );
+        await Friend.findOneAndUpdate(
+            {
+                friendId: req.user._id,
+                user: req.params.id,
+                status: "pending",
+            },
+            { $set: { status: "accepted" } }
+        );
 
-    res.json({ msg: "Friend accepted" });
+        res.json({ msg: "Friend accepted" });
+    } catch (e) {
+        console.log(e);
+    }
 });
 
 module.exports = router;
