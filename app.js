@@ -10,8 +10,10 @@ const cors = require("cors");
 
 var authRouter = require("./routes/auth");
 var postRouter = require("./routes/post");
-var userRouter = require("./routes/users"); 
-var requestRouter = require("./routes/requests"); 
+var userRouter = require("./routes/users");
+var requestRouter = require("./routes/requests");
+let notificationRouter = require("./routes/notifications");
+let messagesRouter = require("./routes/messaging");
 
 var passport = require("passport");
 var FacebookStrategy = require("passport-facebook").Strategy;
@@ -98,10 +100,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get(
-    "/auth/facebook",
-    passport.authenticate("facebook" )
-);
+app.get("/auth/facebook", passport.authenticate("facebook"));
 
 app.get(
     "/oauth/redirect/facebook",
@@ -142,6 +141,8 @@ app.use("/auth", authRouter);
 app.use("/posts", postRouter);
 app.use("/users", userRouter);
 app.use("/requests", requestRouter);
+app.use("/notifications", notificationRouter);
+app.use("/messages", messagesRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
