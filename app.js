@@ -7,6 +7,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const session = require("express-session");
 const cors = require("cors");
+const Notification = require("./models/Notification");
 
 var authRouter = require("./routes/auth");
 var postRouter = require("./routes/post");
@@ -42,13 +43,33 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(
-    cors({
-        origin: "http://localhost:3000",
-        methods: "GET,POST,PUT,DELETE",
-        credentials: true,
-    })
-);
+var whitelist = [
+    "http://localhost:3000",
+    "http://127.0.0.1:5500",
+    "http://localhost:4000",
+    "https://web.postman.co",
+    "https://cherniakyura.github.io",
+];
+const io = require("socket.io")(3000, {
+    cors: {
+        origin: [...whitelist],
+    },
+});
+var corsOptions = {
+    //true,
+    origin: function (origin, callback) {
+        //  console.log(origin);
+        if (whitelist.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 // // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
@@ -143,6 +164,67 @@ app.use("/users", userRouter);
 app.use("/requests", requestRouter);
 app.use("/notifications", notificationRouter);
 app.use("/messages", messagesRouter);
+
+let users = {};
+io.on("connection", (socket) => {
+    console.log("User connected");
+
+    socket.on("userID", (userID) => {
+        users[userID] = socket.id;
+    });
+
+    socket.on("friendRequest", (request) => {
+        const userSocket = users[request.user];
+
+        userSocket &&
+            socket.broadcast.to(userSocket).emit("recieveRequest", request);
+    });
+
+    socket.on("notification", async (notification) => {
+        if (notification.sender === notification.recipient) return;
+
+        const newNotification = await Notification.findOneAndUpdate(
+            notification,
+            { $setOnInsert: notification },
+            { upsert: true, new: true }
+        ).populate("sender", ["firstName", "familyName", "profilePic"]);
+
+        const recipientID = notification.recipient;
+        const userSocket = users[recipientID];
+
+        userSocket &&
+            socket.broadcast
+                .to(userSocket)
+                .emit("recieveNotification", newNotification);
+    });
+
+    socket.on("message", (message, recipientID) => {
+        const userSocket = users[recipientID];
+
+        userSocket &&
+            socket.broadcast.to(userSocket).emit("recieveMessage", message);
+    });
+
+    socket.on("typing", (recipientID) => {
+        const userSocket = users[recipientID];
+
+        userSocket && socket.broadcast.to(userSocket).emit("typing");
+    });
+
+    io.on("disconnect", (socket) => {
+        const keys = Object.keys(users);
+
+        keys.forEach((key, index) => {
+            if (users[key] === socket.id) delete users[key];
+            //console.log(`${key}: ${users[key]}`);
+        });
+
+        // for (const socketID in users) {
+        //     if (users[socketID] === socket.id) delete users[socketID];
+        // }
+        console.log(users);
+    });
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
