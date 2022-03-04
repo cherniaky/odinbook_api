@@ -13,7 +13,7 @@ const jwtMidd = function (req, res, next) {
 
         //console.log(accessToken);
         if (!accessToken) {
-            return res.status(402).send("Autorization");
+            return res.status(401).send("Autorization");
         }
 
         // const userData = tokenService.validateAccessToken(accessToken);
@@ -23,7 +23,7 @@ const jwtMidd = function (req, res, next) {
         );
         //console.log(userData);
         if (!userData) {
-            return res.status(403).send("Autorization");
+            return res.status(401).send("Autorization");
         }
 
         req.user = userData;

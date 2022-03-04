@@ -22,7 +22,7 @@ var FacebookStrategy = require("passport-facebook").Strategy;
 const User = require("./models/User");
 
 const server_url = "http://localhost:3000";
-const CLIENT_URL = "http://localhost:5000";
+const CLIENT_URL = "http://localhost:4000";
 
 var app = express();
 
@@ -50,7 +50,7 @@ var whitelist = [
     "https://web.postman.co",
     "https://cherniakyura.github.io",
 ];
-const io = require("socket.io")(3000, {
+const io = require("socket.io")(3500, {
     cors: {
         origin: [...whitelist],
     },
@@ -167,6 +167,7 @@ app.use("/messages", messagesRouter);
 
 let users = {};
 io.on("connection", (socket) => {
+
     console.log("User connected");
 
     socket.on("userID", (userID) => {
@@ -218,10 +219,6 @@ io.on("connection", (socket) => {
             if (users[key] === socket.id) delete users[key];
             //console.log(`${key}: ${users[key]}`);
         });
-
-        // for (const socketID in users) {
-        //     if (users[socketID] === socket.id) delete users[socketID];
-        // }
         console.log(users);
     });
 });
