@@ -7,11 +7,6 @@ const { body, validationResult } = require("express-validator");
 const Token = require("../models/Token");
 const User = require("../models/User");
 
-
-
-
-
-
 async function saveToken(userid, refreshToken) {
     const tokenData = await Token.findOne({ user: userid });
     if (tokenData) {
@@ -29,14 +24,14 @@ router.post("/login", async (req, res, next) => {
     );
 
     if (!user) {
-        return res.status(404).send("User not found!");
+        return res.status(500).send("User not found!");
     }
 
     const validate = bcrypt.compareSync(req.body.password, user.password);
     //req.body.password === user.password;
 
     if (!validate) {
-        return res.status(400).send("Wrong Password");
+        return res.status(500).send("Wrong Password");
     }
 
     try {
@@ -47,9 +42,13 @@ router.post("/login", async (req, res, next) => {
             email: user.email,
         };
 
-        const accessToken = jwt.sign({ user: userData }, process.env.SECRET_KEY, {
-            expiresIn: "15m",
-        });
+        const accessToken = jwt.sign(
+            { user: userData },
+            process.env.SECRET_KEY,
+            {
+                expiresIn: "15m",
+            }
+        );
         const refreshToken = jwt.sign(
             { user: userData },
             process.env.SECRET_KEY_REFRESH,
@@ -89,12 +88,48 @@ router.post("/login/facebook", async (req, res, next) => {
             familyName: req.body.familyName || "No family name",
             email: req.body.email || "No email",
             password: hash,
+            facebookId: req.body.facebookId,
+            profilePic: req.body.profilePic || "",
         };
-        await User.create({ ...user });
-        return res.json({
-            message: "Signed-up sucessfuly",
-            user,
+       const mongoUser =  await User.create({ ...user });
+
+        const userData = {
+            _id: mongoUser._id,
+            firstName: mongoUser.firstName,
+            familyName: mongoUser.familyName,
+            email: mongoUser.email,
+            facebookId: mongoUser.facebookId,
+            profilePic: mongoUser.profilePic || "",
+        };
+
+        const accessToken = jwt.sign(
+            { user: userData },
+            process.env.SECRET_KEY,
+            {
+                expiresIn: "15m",
+            }
+        );
+        const refreshToken = jwt.sign(
+            { user: userData },
+            process.env.SECRET_KEY_REFRESH,
+            {
+                expiresIn: "15d",
+            }
+        );
+
+        await saveToken(mongoUser._id, refreshToken);
+
+        // res.setHeader("set-cookie", [
+        //     `refreshToken=${refreshToken}; Max-Age=1296000; Path=/; SameSite=None;Secure `,
+        // ]);
+        res.cookie("refreshToken", refreshToken, {
+            maxAge: 15 * 24 * 60 * 60 * 1000,
+            //httpOnly: true,
+            // sameSite: "none",
         });
+
+        return res.json({ accessToken, refreshToken, user: userData });
+        
         // return res.status(404).send("User not found!");
     }
 
@@ -111,11 +146,17 @@ router.post("/login/facebook", async (req, res, next) => {
             firstName: user.firstName,
             familyName: user.familyName,
             email: user.email,
+            facebookId: req.body.facebookId,
+            profilePic: req.body.profilePic || "",
         };
 
-        const accessToken = jwt.sign({ user: userData }, process.env.SECRET_KEY, {
-            expiresIn: "15m",
-        });
+        const accessToken = jwt.sign(
+            { user: userData },
+            process.env.SECRET_KEY,
+            {
+                expiresIn: "15m",
+            }
+        );
         const refreshToken = jwt.sign(
             { user: userData },
             process.env.SECRET_KEY_REFRESH,

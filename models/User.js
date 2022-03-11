@@ -21,7 +21,7 @@ const UserSchema = new Schema(
             type: String,
             required: true,
         },
-        facebookId: { type: Number },
+        facebookId: { type: String },
         password: {
             type: String,
             required: true,
