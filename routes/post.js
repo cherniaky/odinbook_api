@@ -97,6 +97,7 @@ router.get("/feed", jwtMidd, async (req, res) => {
                 return friend.friendId;
             }
         });
+        // console.log("🚀 ~ file: post.js ~ line 100 ~ friends ~ friends", friends)
         //console.log(user);
         friends.push(user._id);
 
