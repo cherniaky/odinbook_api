@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const jwtMidd = require("../middleware/jwtAuth");
 const { body, validationResult } = require("express-validator");
 let { cloudinary } = require("../cloudinary");
@@ -30,13 +31,27 @@ router.post(
                 {
                     participants: {
                         $all: [
-                            mongoose.Types.ObjectId(req.user._id),
-                            mongoose.Types.ObjectId(req.params.userID),
+                            {
+                                $elemMatch: {
+                                    $eq: mongoose.Types.ObjectId(req.user._id),
+                                },
+                            },
+                            {
+                                $elemMatch: {
+                                    $eq: mongoose.Types.ObjectId(
+                                        req.params.userID
+                                    ),
+                                },
+                            },
                         ],
                     },
                 },
                 {
-                    $set: { lastMessage: message._id, lastUpdated: Date.now() },
+                    $set: {
+                        lastMessage: message._id,
+                        lastUpdated: Date.now(),
+                        //  participants: [req.user._id, req.params.userID],
+                    },
                     $setOnInsert: {
                         participants: [req.user._id, req.params.userID],
                     },
@@ -105,6 +120,5 @@ router.get("/chats/:id", jwtMidd, async (req, res) => {
         res.status(500).json("Server error");
     }
 });
-
 
 module.exports = router;

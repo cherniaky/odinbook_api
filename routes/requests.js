@@ -16,7 +16,7 @@ router.get("/", jwtMidd, async (req, res) => {
         });
 
         const requests = user.friends.filter(
-            (friend) => friend.status === "recieved"
+            (friend) => friend.status === "recieved" || friend.status === "seen"
         );
 
         res.json(requests);
