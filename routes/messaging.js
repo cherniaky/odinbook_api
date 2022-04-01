@@ -26,7 +26,7 @@ router.post(
                 sender: req.user._id,
                 text: req.body.text,
             });
-
+            // console.log(message);
             const conversation = await Conversation.findOneAndUpdate(
                 {
                     participants: {
@@ -103,7 +103,7 @@ router.get("/", jwtMidd, async (req, res) => {
 router.get("/chats/:id", jwtMidd, async (req, res) => {
     try {
         await Message.updateMany(
-            { conversation: req.params.id },
+            { conversation: req.params.id, sender: { $ne: req.user._id } },
             { $set: { seen: true } }
         );
 
