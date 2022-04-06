@@ -92,7 +92,7 @@ router.get("/", jwtMidd, async (req, res) => {
                 ],
             })
             .sort({ lastUpdated: -1 });
-
+           // console.log(conversations);
         res.json(conversations);
     } catch (err) {
         console.error(err);
