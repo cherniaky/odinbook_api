@@ -14,7 +14,10 @@ const NotificationSchema = new Schema({
         type: mongoose.Types.ObjectId,
         ref: "post",
     },
-    type: {
+    senderName: {
+        type: String,
+    },
+    text: {
         type: String,
     },
     seen: {

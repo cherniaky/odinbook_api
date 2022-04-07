@@ -168,7 +168,7 @@ app.use("/messages", messagesRouter);
 let users = {};
 io.on("connection", (socket) => {
 
-    console.log("User connected");
+   // console.log("User connected");
 
     socket.on("userID", (userID) => {
         users[userID] = socket.id;
@@ -181,22 +181,20 @@ io.on("connection", (socket) => {
             socket.broadcast.to(userSocket).emit("recieveRequest", request);
     });
 
-    socket.on("notification", async (notification) => {
-        if (notification.sender === notification.recipient) return;
+    socket.on("notification", async (recipientID) => {
+       // if (notification.sender === notification.recipient) return;
 
-        const newNotification = await Notification.findOneAndUpdate(
-            notification,
-            { $setOnInsert: notification },
-            { upsert: true, new: true }
-        ).populate("sender", ["firstName", "familyName", "profilePic"]);
+        // const newNotification = await Notification.findOneAndUpdate(
+        //     notification,
+        //     { $setOnInsert: notification },
+        //     { upsert: true, new: true }
+        // ).populate("sender", ["firstName", "familyName", "profilePic"]);
 
-        const recipientID = notification.recipient;
+        //const recipientID = notification.recipient;
         const userSocket = users[recipientID];
 
         userSocket &&
-            socket.broadcast
-                .to(userSocket)
-                .emit("recieveNotification", newNotification);
+            socket.broadcast.to(userSocket).emit("recieveNotification", "new");
     });
 
     socket.on("message", (message, recipientID) => {
@@ -206,20 +204,14 @@ io.on("connection", (socket) => {
             socket.broadcast.to(userSocket).emit("recieveMessage", message);
     });
 
-    socket.on("typing", (recipientID) => {
-        const userSocket = users[recipientID];
-
-        userSocket && socket.broadcast.to(userSocket).emit("typing");
-    });
-
-    io.on("disconnect", (socket) => {
+    socket.on("disconnect", (socket) => {
         const keys = Object.keys(users);
 
         keys.forEach((key, index) => {
             if (users[key] === socket.id) delete users[key];
-            //console.log(`${key}: ${users[key]}`);
+           // console.log(`${key}: ${users[key]}`);
         });
-        console.log(users);
+       // console.log("disonect");
     });
 });
 
