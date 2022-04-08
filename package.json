@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "start": "node ./bin/www",
+        "start": "node app.js",
         "devstart": "nodemon ./bin/www",
         "serverstart": "SET DEBUG=pc-planner-express:* & npm run devstart"
     },
