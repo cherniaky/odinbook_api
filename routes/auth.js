@@ -194,8 +194,8 @@ router.get("/logout", async function (req, res) {
     });
 });
 
-router.get("/refresh", async function (req, res, next) {
-     const { refreshToken } = req.cookies;
+router.post("/refresh", async function (req, res, next) {
+     const { refreshToken } = req.body;
 
     // console.log(refreshToken);
     // console.log(
