@@ -3,8 +3,8 @@
     "version": "0.0.0",
     "private": true,
     "scripts": {
-        "start": "node app.js",
-        "devstart": "nodemon app.js",
+        "start": "node server.js",
+        "devstart": "nodemon server.js",
         "serverstart": "SET DEBUG=pc-planner-express:* & npm run devstart"
     },
     "dependencies": {

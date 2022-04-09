@@ -65,7 +65,7 @@ const io = require("socket.io")(http, {
     },
 });
 var corsOptions = {
-    //true,
+    
     origin: function (origin, callback) {
         //  console.log(origin);
         if (whitelist.indexOf(origin) !== -1 || !origin) {
