@@ -174,8 +174,8 @@ app.use("/requests", requestRouter);
 app.use("/notifications", notificationRouter);
 app.use("/messages", messagesRouter);
 
-http.listen(3000, () => {
-   // console.log(`server listening on port ${PORT}`);
+http.listen(process.env.PORT || 3000, () => {
+    // console.log(`server listening on port ${PORT}`);
 });
 
 let users = {};
