@@ -19,7 +19,10 @@ router.post(
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        console.log(req.body.recipientId);
+        if (req.user._id == req.body.recipientId) {
+            res.status(200).json({ msg: "userId is equal recipientId" });
+        }
+        // console.log(req.body.recipientId);
         try {
             newNotification = new Notification({
                 sender: req.user._id,
