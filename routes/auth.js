@@ -62,11 +62,11 @@ router.post("/login", async (req, res, next) => {
         // res.setHeader("set-cookie", [
         //     `refreshToken=${refreshToken}; Max-Age=1296000; Path=/; SameSite=None;Secure `,
         // ]);
-        res.cookie("refreshToken", refreshToken, {
-            maxAge: 15 * 24 * 60 * 60 * 1000,
-            //httpOnly: true,
-            // sameSite: "none",
-        });
+        // res.cookie("refreshToken", refreshToken, {
+        //     maxAge: 15 * 24 * 60 * 60 * 1000,
+        //     //httpOnly: true,
+        //     // sameSite: "none",
+        // });
 
         return res.json({ accessToken, refreshToken, user: userData });
     } catch (error) {
@@ -122,11 +122,11 @@ router.post("/login/facebook", async (req, res, next) => {
         // res.setHeader("set-cookie", [
         //     `refreshToken=${refreshToken}; Max-Age=1296000; Path=/; SameSite=None;Secure `,
         // ]);
-        res.cookie("refreshToken", refreshToken, {
-            maxAge: 15 * 24 * 60 * 60 * 1000,
-            //httpOnly: true,
-            // sameSite: "none",
-        });
+        // res.cookie("refreshToken", refreshToken, {
+        //     maxAge: 15 * 24 * 60 * 60 * 1000,
+        //     //httpOnly: true,
+        //     // sameSite: "none",
+        // });
 
         return res.json({ accessToken, refreshToken, user: userData });
 
@@ -187,7 +187,7 @@ router.get("/logout", async function (req, res) {
 
     await Token.deleteOne({ token: refreshToken });
 
-    res.clearCookie("refreshToken");
+    //res.clearCookie("refreshToken");
     res.json({
         status: "logout",
         msg: "Please Log In again",
@@ -245,12 +245,12 @@ router.get("/refresh", async function (req, res, next) {
     // res.setHeader("set-cookie", [
     //     `refreshToken=${newRefreshToken}; Max-Age=1296000; Path=/;  SameSite=None;Secure `,
     // ]);
-    res.cookie("refreshToken", newRefreshToken, {
-        maxAge: 15 * 24 * 60 * 60 * 1000,
-        //httpOnly: true,
-        // sameSite: "none",
-        //secure: true,
-    });
+    // res.cookie("refreshToken", newRefreshToken, {
+    //     maxAge: 15 * 24 * 60 * 60 * 1000,
+    //     //httpOnly: true,
+    //     // sameSite: "none",
+    //     //secure: true,
+    // });
 
     // console.log(accessToken , newRefreshToken , userData);
     return res.json({
