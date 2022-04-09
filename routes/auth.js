@@ -91,7 +91,7 @@ router.post("/login/facebook", async (req, res, next) => {
             facebookId: req.body.facebookId,
             profilePic: req.body.profilePic || "",
         };
-       const mongoUser =  await User.create({ ...user });
+        const mongoUser = await User.create({ ...user });
 
         const userData = {
             _id: mongoUser._id,
@@ -129,7 +129,7 @@ router.post("/login/facebook", async (req, res, next) => {
         });
 
         return res.json({ accessToken, refreshToken, user: userData });
-        
+
         // return res.status(404).send("User not found!");
     }
 
@@ -195,8 +195,20 @@ router.get("/logout", async function (req, res) {
 });
 
 router.get("/refresh", async function (req, res, next) {
-    const { refreshToken } = req.cookies;
-    //console.log(refreshToken)
+    // const { refreshToken } = req.cookies;
+
+    // console.log(refreshToken);
+    // console.log(
+    //     req.headers.cookie
+    //         .split(" ")
+    //         .find((str) => str.includes("refreshToken"))
+    //         .slice(13, -1)
+    // );
+    const refreshToken = req.headers.cookie
+        .split(" ")
+        .find((str) => str.includes("refreshToken"))
+        .slice(13, -1);
+        
     if (!refreshToken) {
         return res.status(404).send("No refresh token");
     }
