@@ -195,7 +195,7 @@ router.get("/logout", async function (req, res) {
 });
 
 router.get("/refresh", async function (req, res, next) {
-    // const { refreshToken } = req.cookies;
+     const { refreshToken } = req.cookies;
 
     // console.log(refreshToken);
     // console.log(
@@ -204,11 +204,11 @@ router.get("/refresh", async function (req, res, next) {
     //         .find((str) => str.includes("refreshToken"))
     //         .slice(13, -1)
     // );
-    const refreshToken = req.headers.cookie
-        .split(" ")
-        .find((str) => str.includes("refreshToken"))
-        .slice(13, -1);
-        
+    // const refreshToken = req.headers.cookie
+    //     .split(" ")
+    //     .find((str) => str.includes("refreshToken"))
+    //     .slice(13, -1);
+
     if (!refreshToken) {
         return res.status(404).send("No refresh token");
     }
