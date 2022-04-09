@@ -2,6 +2,9 @@
     "name": "odinbook",
     "version": "0.0.0",
     "private": true,
+    "engines": {
+        "node": "14.16.1"
+    },
     "scripts": {
         "start": "node server.js",
         "devstart": "nodemon server.js",
