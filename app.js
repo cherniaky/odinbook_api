@@ -15,7 +15,6 @@ var userRouter = require("./routes/users");
 var requestRouter = require("./routes/requests");
 let notificationRouter = require("./routes/notifications");
 let messagesRouter = require("./routes/messaging");
-var http = require("http");
 
 var passport = require("passport");
 var FacebookStrategy = require("passport-facebook").Strategy;
@@ -26,6 +25,7 @@ const server_url = "http://localhost:3000";
 const CLIENT_URL = "http://localhost:4000";
 
 var app = express();
+const http = require("http").createServer(app);
 
 require("./mongoDBConfig");
 
@@ -52,9 +52,14 @@ var whitelist = [
     "https://cherniakyura.github.io",
 ];
 //let server = require("./bin/www");
-var server = http.createServer(app);
+//var server = http.createServer(app);
 
-const io = require("socket.io")(server, {
+// const io = require("socket.io")(server, {
+//     cors: {
+//         origin: [...whitelist],
+//     },
+// });
+const io = require("socket.io")(http, {
     cors: {
         origin: [...whitelist],
     },
@@ -169,13 +174,13 @@ app.use("/requests", requestRouter);
 app.use("/notifications", notificationRouter);
 app.use("/messages", messagesRouter);
 
-server.listen(3000, () => {
+http.listen(3000, () => {
    // console.log(`server listening on port ${PORT}`);
 });
 
 let users = {};
 io.on("connection", (socket) => {
-    // console.log("User connected");
+     console.log("User connected");
 
     socket.on("userID", (userID) => {
         users[userID] = socket.id;
@@ -218,7 +223,7 @@ io.on("connection", (socket) => {
             if (users[key] === socket.id) delete users[key];
             // console.log(`${key}: ${users[key]}`);
         });
-        // console.log("disonect");
+         console.log("disonect");
     });
 });
 
