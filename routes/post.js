@@ -7,6 +7,29 @@ const User = require("../models/User");
 const Post = require("../models/Post");
 const Friend = require("../models/Friend");
 
+// router.post("/file", upload.single("postImage"), async (req, res) => {
+//     const errors = validationResult(req);
+
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     try {
+
+//         if (req.body.file) {
+//             console.log("FILE", req.file);
+//             //newPost.img = req.file.path;
+//         }
+
+//         //newPost.user = user;
+
+//         res.json(req.file);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ errors: [{ msg: "500: Server error" }] });
+//     }
+// });
+
 router.post(
     "/",
     jwtMidd,
@@ -29,6 +52,11 @@ router.post(
                 text: req.body.text,
                 profilePic: user.profilePic || "",
             });
+
+            if (req.body.imgUrl) {
+                newPost.img = req.body.imgUrl;
+                newPost.imgName = req.body.imgName;
+            }
 
             await newPost.save();
 
@@ -69,6 +97,10 @@ router.post(
                 text: req.body.text,
             });
             //console.log(newPost);
+            if (req.body.imgUrl) {
+                newPost.img = req.body.imgUrl;
+                newPost.imgName = req.body.imgName;
+            }
 
             await newPost.save();
 
@@ -86,8 +118,7 @@ router.post(
 router.get("/feed", jwtMidd, async (req, res) => {
     try {
         ///console.log(req.user);
-        const user = await User.findById(req.user._id)
-        .populate("friends", [
+        const user = await User.findById(req.user._id).populate("friends", [
             "status",
             "friendId",
         ]);
@@ -132,7 +163,9 @@ router.get("/:id", async (req, res) => {
 
 router.get("/users/:user_id", async (req, res) => {
     try {
-        const posts = await Post.find({ user: req.params.user_id }).sort({ date: -1 });
+        const posts = await Post.find({ user: req.params.user_id }).sort({
+            date: -1,
+        });
 
         res.json(posts);
     } catch (err) {
@@ -154,15 +187,12 @@ router.get("/users/:user_id/wall", async (req, res) => {
     }
 });
 
-
-
 router.post("/:id/like", jwtMidd, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
         //console.log(post);
         // Unlike post if already liked
         if (post.likes.some((like) => like.user.toString() === req.user._id)) {
-
             post.likes = post.likes.filter(
                 (like) => like.user.toString() !== req.user._id
             );
@@ -216,28 +246,34 @@ router.post(
     }
 );
 
-router.post("/:post_id/comments/:comment_id/like", jwtMidd, async (req, res) => {
-    const post = await Post.findById(req.params.post_id);
+router.post(
+    "/:post_id/comments/:comment_id/like",
+    jwtMidd,
+    async (req, res) => {
+        const post = await Post.findById(req.params.post_id);
 
-    const comment = post.comments.find(
-        (comment) => comment._id.toString() === req.params.comment_id
-    );
-
-    if (comment.likes.some((like) => like.user.toString() === req.user._id)) {
-        comment.likes = comment.likes.filter(
-            (like) => like.user.toString() !== req.user._id
+        const comment = post.comments.find(
+            (comment) => comment._id.toString() === req.params.comment_id
         );
+
+        if (
+            comment.likes.some((like) => like.user.toString() === req.user._id)
+        ) {
+            comment.likes = comment.likes.filter(
+                (like) => like.user.toString() !== req.user._id
+            );
+            await post.save();
+
+            return res.json(comment.likes);
+        }
+
+        comment.likes.unshift({ user: req.user._id });
+
         await post.save();
 
-        return res.json(comment.likes);
+        res.json(comment.likes);
     }
-
-    comment.likes.unshift({ user: req.user._id });
-
-    await post.save();
-
-    res.json(comment.likes);
-});
+);
 
 router.delete("/:id", jwtMidd, async (req, res) => {
     try {
@@ -280,10 +316,9 @@ router.delete("/:post_id/comments/:comment_id", jwtMidd, async (req, res) => {
                 .json({ errors: [{ msg: "401: Unauthorised" }] });
         }
 
-         post.comments = post.comments.filter(
-             (comment) => comment._id.toString() !== req.params.comment_id
-         );
-        
+        post.comments = post.comments.filter(
+            (comment) => comment._id.toString() !== req.params.comment_id
+        );
 
         await post.save();
 

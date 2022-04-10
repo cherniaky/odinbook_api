@@ -68,7 +68,7 @@ router.post("/login", async (req, res, next) => {
         //     // sameSite: "none",
         // });
 
-        return res.json({ accessToken, refreshToken, user: userData });
+        return res.json({ accessToken, refreshToken, user});
     } catch (error) {
         return next(error);
     }
@@ -176,7 +176,7 @@ router.post("/login/facebook", async (req, res, next) => {
             // sameSite: "none",
         });
 
-        return res.json({ accessToken, refreshToken, user: userData });
+        return res.json({ accessToken, refreshToken, user});
     } catch (error) {
         return next(error);
     }
@@ -256,7 +256,7 @@ router.post("/refresh", async function (req, res, next) {
     return res.json({
         accessToken,
         refreshToken: newRefreshToken,
-        user: userData,
+        user,
     });
 });
 

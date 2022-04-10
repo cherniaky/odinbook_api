@@ -30,6 +30,9 @@ const UserSchema = new Schema(
         profilePic: {
             type: String,
         },
+        profilePicName: {
+            type: String,
+        },
         friends: [
             {
                 type: mongoose.Types.ObjectId,

@@ -82,7 +82,13 @@ router.get("/:id/friends", async (req, res) => {
 
 router.put("/current/profile", jwtMidd, async (req, res) => {
     try {
-        const { location, bio, occupation, image } = req.body;
+        const {
+            location,
+            bio,
+            occupation,
+            imgUrl = "",
+            profilePicName = "",
+        } = req.body;
         // console.log(req.body);
         const user = await User.findByIdAndUpdate(
             req.user._id,
@@ -92,23 +98,25 @@ router.put("/current/profile", jwtMidd, async (req, res) => {
                     bio,
                     occupation,
                 },
+                profilePic: imgUrl,
+                profilePicName,
             },
             { new: true }
         );
 
-        if (image) {
-            const fileString = req.body.image;
-            const uploadResponse = await cloudinary.uploader.upload(
-                fileString,
-                {
-                    upload_preset: "odinbook-profile-pics",
-                }
-            );
+        // if (image) {
+        //     const fileString = req.body.image;
+        //     const uploadResponse = await cloudinary.uploader.upload(
+        //         fileString,
+        //         {
+        //             upload_preset: "odinbook-profile-pics",
+        //         }
+        //     );
 
-            user.profilePic = uploadResponse.url;
+        //     user.profilePic = uploadResponse.url;
 
-            await user.save();
-        }
+        //     await user.save();
+        // }
 
         res.json(user);
     } catch (err) {
