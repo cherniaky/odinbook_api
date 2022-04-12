@@ -20,7 +20,7 @@ router.post(
             return res.status(400).json({ errors: errors.array() });
         }
         if (req.user._id == req.body.recipientId) {
-            res.status(200).json({ msg: "userId is equal recipientId" });
+           return res.status(200).json({ msg: "userId is equal recipientId" });
         }
         // console.log(req.body.recipientId);
         try {
