@@ -3,7 +3,6 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const jwtMidd = require("../middleware/jwtAuth");
 const { body, validationResult } = require("express-validator");
-let { cloudinary } = require("../cloudinary");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Post = require("../models/Post");
@@ -92,7 +91,7 @@ router.get("/", jwtMidd, async (req, res) => {
                 ],
             })
             .sort({ lastUpdated: -1 });
-           // console.log(conversations);
+        // console.log(conversations);
         res.json(conversations);
     } catch (err) {
         console.error(err);

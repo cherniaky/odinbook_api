@@ -22,7 +22,6 @@ router.post("/login", async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email }).select(
         "+password"
     );
-
     if (!user) {
         return res.status(500).send("User not found!");
     }
@@ -68,7 +67,7 @@ router.post("/login", async (req, res, next) => {
         //     // sameSite: "none",
         // });
 
-        return res.json({ accessToken, refreshToken, user});
+        return res.json({ accessToken, refreshToken, user });
     } catch (error) {
         return next(error);
     }
@@ -176,7 +175,7 @@ router.post("/login/facebook", async (req, res, next) => {
             // sameSite: "none",
         });
 
-        return res.json({ accessToken, refreshToken, user});
+        return res.json({ accessToken, refreshToken, user });
     } catch (error) {
         return next(error);
     }
@@ -195,7 +194,7 @@ router.get("/logout", async function (req, res) {
 });
 
 router.post("/refresh", async function (req, res, next) {
-     const { refreshToken } = req.body;
+    const { refreshToken } = req.body;
 
     // console.log(refreshToken);
     // console.log(
