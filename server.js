@@ -48,6 +48,7 @@ var whitelist = [
     "http://localhost:3000",
     "http://127.0.0.1:5500",
     "http://localhost:4000",
+    "https://zctfront.azurewebsites.net",
     "https://web.postman.co",
     "https://cherniakyura.github.io",
 ];
@@ -65,7 +66,6 @@ const io = require("socket.io")(http, {
     },
 });
 var corsOptions = {
-    
     origin: function (origin, callback) {
         //  console.log(origin);
         if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -174,13 +174,13 @@ app.use("/requests", requestRouter);
 app.use("/notifications", notificationRouter);
 app.use("/messages", messagesRouter);
 
-http.listen(process.env.PORT || 3000, () => {   
+http.listen(process.env.PORT || 3000, () => {
     // console.log(`server listening on port ${PORT}`);
 });
 
 let users = {};
 io.on("connection", (socket) => {
-     console.log("User connected");
+    console.log("User connected");
 
     socket.on("userID", (userID) => {
         users[userID] = socket.id;
@@ -223,7 +223,7 @@ io.on("connection", (socket) => {
             if (users[key] === socket.id) delete users[key];
             // console.log(`${key}: ${users[key]}`);
         });
-         console.log("disonect");
+        console.log("disonect");
     });
 });
 
